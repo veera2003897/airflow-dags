@@ -6,7 +6,7 @@ def hello_world():
     print("Hello, Airflow!")
 
 with DAG(
-    dag_id="dsync",
+    dag_id="dsync_dag_1",
     dag_display_name = 'Dsync',
     start_date=datetime(2024, 1, 1),
     schedule_interval="@daily",
