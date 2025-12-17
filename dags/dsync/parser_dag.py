@@ -1,12 +1,11 @@
 from airflow import DAG
-from airflow.sdk.definitions.decorators import task
+from airflow.decorators import task
 from datetime import datetime
 import requests
 import json
 
-# ✔ REPLACE THIS with your webhook
+# ✔ Google Chat webhook
 GOOGLE_CHAT_WEBHOOK = "https://chat.googleapis.com/v1/spaces/AAQAbrTjw08/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=qnXsngkbXjbXL6K_1--mD4uXVKbie4T2uEHBxXOInm0"
-
 
 DEFAULT_EMAIL = "nagavarunkumar.parvathareddy@coartha.com"
 
@@ -46,16 +45,16 @@ def failure_callback(context):
 # -----------------------------------------------------------------
 default_args = {
     "owner": "airflow",
-    "email": [DEFAULT_EMAIL],      # email on failure
+    "email": [DEFAULT_EMAIL],
     "email_on_failure": True,
     "email_on_retry": False,
-    "on_failure_callback": failure_callback,   # Google Chat failure alert
+    "on_failure_callback": failure_callback,
 }
 
 with DAG(
     dag_id="parser_dag",
     start_date=datetime(2024, 1, 1),
-    schedule=None,
+    schedule_interval="@daily",
     catchup=False,
     default_args=default_args,
     tags=["parser"],
@@ -73,11 +72,7 @@ with DAG(
 
     @task
     def resumes_enriched():
-        send_chat_message("Parsers -✨ *Resumes Enriched*")
+        send_chat_message("Parsers - ✨ *Resumes Enriched*")
         return "OK"
 
-    t1 = resumes_received()
-    t2 = resumes_parsed()
-    t3 = resumes_enriched()
-
-    t1 >> t2 >> t3
+    resumes_received() >> resumes_parsed() >> resumes_enriched()

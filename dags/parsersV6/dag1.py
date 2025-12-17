@@ -1,30 +1,20 @@
 from airflow import DAG
+from airflow.decorators import task
 from datetime import datetime
-from airflow.operators.python import PythonOperator
-
-
-def sample_dag():
-    for i in range(10):
-        print(i)
-
-def sample_dag2():
-    print('HELLO MAPRECRUIT')
 
 with DAG(
-    dag_id = 'parser_',
-    dag_display_name= 'PARSERS',
-    schedule= '0 0 * * *',
-    start_date=datetime(2020, 1, 1),
-
+    dag_id='parser_task_dag',
+    start_date=datetime(2024, 1, 1),
+    schedule_interval='0 0 * * *',
+    catchup=False,
 ) as dag:
 
-    task1 = PythonOperator(
-        python_callable=sample_dag,
-        task_id='print_1-10',
-    )
+    @task
+    def sample_task():
+        print("Hello from sample_task!")
 
-    task2 = PythonOperator(
-        python_callable=sample_dag2,
-    )
+    @task
+    def another_task():
+        print("Hello from another_task!")
 
-    task1 >> task2
+    sample_task() >> another_task()
